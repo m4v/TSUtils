@@ -235,6 +235,9 @@ namespace TrackingStationUtils
 
 		public static void RenameVessel(Vessel vessel) 
 		{
+			if (vessel == null) {
+				return;
+			}
 			vessel.RenameVessel();
 		}
 	}
