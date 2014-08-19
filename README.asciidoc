@@ -59,6 +59,12 @@ Links
 Repository in GitHub:
 https://github.com/m4v/TSUtils
 
+Forum thread:
+http://forum.kerbalspaceprogram.com/threads/91094
+    
+Curse site:
+http://curse.com/project/223557
+
 License
 -------
 
