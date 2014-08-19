@@ -39,7 +39,7 @@ namespace TrackingStationUtils
 			button = ToolbarManager.Instance.add ("TrackingStationUtils", "main_menu");
 			button.ToolTip = "Tracking Station Utils";
 			button.Visibility = new GameScenesVisibility(GameScenes.TRACKSTATION);
-			button.TexturePath = "TrackingStationUtils/Textures/tsutils_24";
+			button.TexturePath = "TSUtils/Textures/tsutils_24";
 			button.OnClick += (e) => onClick(button);
 		}
 

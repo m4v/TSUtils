@@ -95,7 +95,6 @@ namespace TrackingStationUtils
 			switch (mode) {
 			case Modes.ShowParts:
 				winRect = GUILayout.Window (windowsId, winRect, drawWindow, "Parts list");
-				print (winRect);
 				break;
 			case Modes.ShowRes:
 				winRect = GUILayout.Window (windowsId, winRect, drawWindow, "Resource list");
