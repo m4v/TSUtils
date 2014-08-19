@@ -1,0 +1,12 @@
+Tracking Station Utils Changelog
+================================
+Elián Hanisch <lambdae2@gmail.com>
+v0.1, August 2014:
+
+This document lists important changes between versions.
+
+Version 0.1
+-----------
+*Release date: 19/08/2014*
+
+* Initial release.

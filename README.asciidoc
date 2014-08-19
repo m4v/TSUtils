@@ -1,0 +1,80 @@
+Tracking Station Utils Plugin
+=============================
+Elián Hanisch <lambdae2@gmail.com>
+v0.1, August 2014:
+
+Tool for renaming vessels from the tracking station.
+
+Requirements
+------------
+
+* KSP version 0.24.2
+* blizzy78's toolbar http://forum.kerbalspaceprogram.com/threads/60863
+
+Optional
+~~~~~~~~
+
+* KSP-AVC Plugin for update notifications http://forum.kerbalspaceprogram.com/threads/7974
+ 
+Installation
+------------
+
+Just copy into your KSP's GameData directory, make sure you have blizzy toolbar
+installed.
+
+Features
+--------
+
+* Rename and change your vessels type.
+* See vessel's part list.
+* See vessel's resources.
+
+Known Issues
+------------
+
+* Can't rename flags.
+
+Compiling
+---------
+
+This project picks its references for a local directory for avoid commiting the 
+absolute path of library files into the repository. So if you want this project 
+to find its references without changing any project files you have create a 
+local directory named `Libraries` and copy (or symlink) the directory `Managed` 
+from a KSP install and `Toolbar.dll` from blizzy78's toolbar mod.
+
+  Libraries\
+    Managed -> ${KSP_DIR}/KSP_Data/Managed
+    Toolbar.dll -> ${KSP_DIR}/GameData/000_Toolbar/Toolbar.dll
+
+Reporting Bugs
+--------------
+
+You can report bugs or issues directly to GitHub:
+https://github.com/m4v/TSUtils/issues
+
+Links
+-----
+
+Repository in GitHub:
+https://github.com/m4v/TSUtils
+
+License
+-------
+
+This plugin is distributed under the terms of the LGPLv3.
+
+---------------------------------------
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+---------------------------------------
