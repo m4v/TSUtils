@@ -200,18 +200,18 @@ namespace TrackingStationUtils
 		}
 
 		void updateColumnSizes() {
-			string s1 = String.Empty;
-			string s2 = String.Empty;
+			colSize1 = Vector2.zero;
+			colSize2 = Vector2.zero;
 			foreach (var item in itemList) {
-				if (s1.Length < item.Key.Length) {
-					s1 = item.Key;
+				Vector2 size1 = GUI.skin.label.CalcSize (new GUIContent (item.Key));
+				if (colSize1.x < size1.x) {
+					colSize1 = size1;
 				}
-				if (s2.Length < item.Value.Length) {
-					s2 = item.Value;
+				Vector2 size2 = GUI.skin.label.CalcSize (new GUIContent (item.Value));
+				if (colSize2.x < size2.x) {
+					colSize2 = size2;
 				}
 			}
-			colSize1 = GUI.skin.label.CalcSize (new GUIContent (s1));
-			colSize2 = GUI.skin.label.CalcSize (new GUIContent (s2));
 		}
 
 		public static Vessel getSelectedVessel ()
