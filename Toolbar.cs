@@ -55,9 +55,6 @@ namespace TrackingStationUtils
 		void createPopupMenu(IButton button) {
 			bool vesselSelected = TrackingStationUtils.getSelectedVessel () != null;
 			PopupMenuDrawable menu = new PopupMenuDrawable();
-			IButton optRenameVessel = menu.AddOption("Rename vessel");
-			optRenameVessel.Enabled = vesselSelected;
-			optRenameVessel.OnClick += (e) => renameVessel();
 
 			IButton optShowParts = menu.AddOption("Show parts");
 			optShowParts.Enabled = vesselSelected;
@@ -79,11 +76,6 @@ namespace TrackingStationUtils
 		void showInfo ()
 		{
 			TrackingStationUtils.ShowVesselInfo ();
-		}
-
-		void renameVessel ()
-		{
-			TrackingStationUtils.RenameVessel(TrackingStationUtils.getSelectedVessel());
 		}
 
 		void destroyPopupMenu (IButton button)

@@ -231,14 +231,6 @@ namespace TrackingStationUtils
 			Instance.mode = Modes.ShowRes;
 			Instance.itemList = null;
 		}
-
-		public static void RenameVessel(Vessel vessel) 
-		{
-			if (vessel == null) {
-				return;
-			}
-			vessel.RenameVessel();
-		}
 	}
 }
 
