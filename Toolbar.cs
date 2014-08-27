@@ -64,6 +64,10 @@ namespace TrackingStationUtils
 			optShowInfo.Enabled = vesselSelected;
 			optShowInfo.OnClick += (e) => showInfo();
 
+			IButton optShowOrbit = menu.AddOption("Orbit parameters");
+			optShowOrbit.Enabled = vesselSelected || (TrackingStationUtils.getSelectedPlanet() != null);
+			optShowOrbit.OnClick += (e) => showOrbit();
+
 			menu.OnAnyOptionClicked += () => destroyPopupMenu(button);
 			button.Drawable = menu;
 		}
@@ -76,6 +80,11 @@ namespace TrackingStationUtils
 		void showInfo ()
 		{
 			TrackingStationUtils.ShowVesselInfo ();
+		}
+
+		void showOrbit ()
+		{
+			TrackingStationUtils.ShowOrbit ();
 		}
 
 		void destroyPopupMenu (IButton button)

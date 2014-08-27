@@ -28,12 +28,13 @@ namespace TrackingStationUtils
 	[KSPAddon(KSPAddon.Startup.TrackingStation, false)]
 	public class TrackingStationUtils : MonoBehaviour
 	{
-		enum Modes { ShowParts, ShowRes };
+		enum Modes { ShowParts, ShowRes, ShowOrbit };
 
 		public static TrackingStationUtils Instance;
 
 		Modes mode;
 		Vessel vessel;
+		CelestialBody planet;
 		int windowsId;
 		bool guiEnabled = false;
 		Dictionary<string, string> itemList;
@@ -61,12 +62,18 @@ namespace TrackingStationUtils
 		void Update ()
 		{
 			Vessel oldVessel = vessel;
+			CelestialBody oldPlanet = planet;
 			if (isVesselSelected ()) {
 				vessel = PlanetariumCamera.fetch.target.vessel;
 			} else {
 				vessel = null;
 			}
-			if (oldVessel != vessel) {
+			if (isPlanetSelected ()) {
+				planet = PlanetariumCamera.fetch.target.celestialBody;
+			} else {
+				planet = null;
+			}
+			if ((oldVessel != vessel) || (oldPlanet != planet)) {
 				itemList = null;
 			}
 		}
@@ -74,15 +81,35 @@ namespace TrackingStationUtils
 		static bool isVesselSelected ()
 		{
 			return (PlanetariumCamera.fetch != null)
-				&& (PlanetariumCamera.fetch.target != null)
-				&& (PlanetariumCamera.fetch.target.vessel != null)
-				&& (PlanetariumCamera.fetch.target.vessel.vesselType != VesselType.Flag);
+			&& (PlanetariumCamera.fetch.target != null)
+			&& (PlanetariumCamera.fetch.target.vessel != null)
+			&& (PlanetariumCamera.fetch.target.vessel.vesselType != VesselType.Flag);
+		}
+
+		static bool isPlanetSelected ()
+		{
+			return (PlanetariumCamera.fetch != null)
+			&& (PlanetariumCamera.fetch.target != null)
+			&& (PlanetariumCamera.fetch.target.celestialBody != null);
 		}
 
 		void OnGUI ()
 		{
-			if (!guiEnabled || !isVesselSelected()) {
+			if (!guiEnabled) {
 				return;
+			}
+			switch (mode) {
+			case Modes.ShowOrbit:
+				if (!isVesselSelected () && !isPlanetSelected ()) {
+					return;
+				}
+				break;
+			case Modes.ShowParts:
+			case Modes.ShowRes:
+				if (!isVesselSelected ()) {
+					return;
+				}
+				break;
 			}
 			GUI.skin = HighLogic.Skin;
 			GUI.skin.label.wordWrap = false;
@@ -92,14 +119,19 @@ namespace TrackingStationUtils
 				winRect.height = 20;
 			}
 
+			string title = "TSUtils";
 			switch (mode) {
 			case Modes.ShowParts:
-				winRect = GUILayout.Window (windowsId, winRect, drawWindow, "Parts list");
+				title = "Parts list";
 				break;
 			case Modes.ShowRes:
-				winRect = GUILayout.Window (windowsId, winRect, drawWindow, "Resource list");
+				title = "Resource list";
+				break;
+			case Modes.ShowOrbit:
+				title = "Orbit parameters";
 				break;
 			}
+			winRect = GUILayout.Window (windowsId, winRect, drawWindow, title);
 		}
 
 		void drawWindow (int id)
@@ -111,6 +143,13 @@ namespace TrackingStationUtils
 					break;
 				case Modes.ShowRes:
 					itemList = getResourceList (vessel);
+					break;
+				case Modes.ShowOrbit:
+					if (isVesselSelected ()) {
+						itemList = getOrbitParams (vessel.orbit);
+					} else if (isPlanetSelected ()) {
+						itemList = getOrbitParams (planet.orbit);
+					}
 					break;
 				}
 				rows = Mathf.Clamp (itemList.Count, 0, maxRows);
@@ -198,6 +237,20 @@ namespace TrackingStationUtils
 			return dict2;
 		}
 
+		Dictionary<string, string> getOrbitParams (Orbit orbit)
+		{
+			Dictionary<string, string> dict = new Dictionary<string, string> ();
+			dict ["Semi-major axis"] = Utils.format_SI (orbit.semiMajorAxis);
+			dict ["Eccentricity"] = orbit.eccentricity.ToString ("0.####");
+			dict ["Inclination"] = Utils.format_angle (orbit.inclination);
+			dict ["Argument of Pe"] = Utils.format_angle (orbit.argumentOfPeriapsis);
+			dict ["Longitude of AN"] = Utils.format_angle (orbit.LAN);
+			dict ["True anomaly"] = Utils.format_angle (orbit.trueAnomaly);
+			dict ["Orbital period"] = Utils.format_time (orbit.period);
+
+			return dict;
+		}
+
 		void updateColumnSizes() {
 			colSize1 = Vector2.zero;
 			colSize2 = Vector2.zero;
@@ -218,6 +271,11 @@ namespace TrackingStationUtils
 			return Instance.vessel;
 		}
 
+		public static CelestialBody getSelectedPlanet ()
+		{
+			return Instance.planet;
+		}
+
 		public static void ShowParts()
 		{
 			Instance.guiEnabled = true;
@@ -229,6 +287,13 @@ namespace TrackingStationUtils
 		{
 			Instance.guiEnabled = true;
 			Instance.mode = Modes.ShowRes;
+			Instance.itemList = null;
+		}
+
+		public static void ShowOrbit()
+		{
+			Instance.guiEnabled = true;
+			Instance.mode = Modes.ShowOrbit;
 			Instance.itemList = null;
 		}
 	}
