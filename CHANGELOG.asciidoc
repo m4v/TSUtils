@@ -1,9 +1,16 @@
 Tracking Station Utils Changelog
 ================================
 Elián Hanisch <lambdae2@gmail.com>
-v0.1, August 2014:
+v0.2, November 2014:
 
 This document lists important changes between versions.
+
+Version 0.2
+-----------
+*Release date: 08/11/2014*
+
+* Remove redundant rename feature.
+* Display orbit parameters.
 
 Version 0.1
 -----------

@@ -16,7 +16,7 @@ mkdir -vp "$DIR"
 
 # copy plugins
 mkdir -vp "$DIR/Plugins"
-cp -v bin/Release/*.dll "$DIR/Plugins"
+cp -v bin/*.dll "$DIR/Plugins"
 
 # copy sources
 mkdir -vp "$DIR/Sources/"

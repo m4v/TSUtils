@@ -1,14 +1,14 @@
 Tracking Station Utils Plugin
 =============================
 Elián Hanisch <lambdae2@gmail.com>
-v0.1, August 2014:
+v0.2, November 2014:
 
-Tool for renaming vessels from the tracking station.
+Display some information in the tracking station.
 
 Requirements
 ------------
 
-* KSP version 0.24.2
+* KSP version 0.25
 * blizzy78's toolbar http://forum.kerbalspaceprogram.com/threads/60863
 
 Optional
@@ -25,14 +25,9 @@ installed.
 Features
 --------
 
-* Rename and change your vessels type.
 * See vessel's part list.
 * See vessel's resources.
-
-Known Issues
-------------
-
-* Can't rename flags.
+* See vessel's (or celestial body) orbit parameters.
 
 Compiling
 ---------
