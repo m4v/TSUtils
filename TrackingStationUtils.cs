@@ -75,8 +75,7 @@ namespace TrackingStationUtils
 		{
 			return (PlanetariumCamera.fetch != null)
 			&& (PlanetariumCamera.fetch.target != null)
-			&& (PlanetariumCamera.fetch.target.vessel != null)
-			&& (PlanetariumCamera.fetch.target.vessel.vesselType != VesselType.Flag);
+			&& (PlanetariumCamera.fetch.target.vessel != null);
 		}
 
 		static bool isPlanetSelected ()
