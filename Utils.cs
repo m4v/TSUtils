@@ -75,7 +75,7 @@ namespace TrackingStationUtils
             int arcmin = (int) (60 * (d_ - degrees));
             int arcsec = (int) (3600 * (d_ - degrees - (float) arcmin / 60));
 
-            string s = String.Format ("{0,3:0}°{1,2:0}'{2,2:0}\"", degrees, arcmin, arcsec);
+            string s = String.Format ("{0:000}°{1:00}'{2:00}\"", degrees, arcmin, arcsec);
             if (d < 0) {
                 return '-' + s;
             }

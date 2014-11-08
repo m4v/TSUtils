@@ -40,36 +40,36 @@ namespace TrackingStationUtils
 			button.ToolTip = "Tracking Station Utils";
 			button.Visibility = new GameScenesVisibility(GameScenes.TRACKSTATION);
 			button.TexturePath = "TSUtils/Textures/tsutils_24";
-			button.OnClick += (e) => onClick(button);
+			button.OnClick += e => onClick(button);
 		}
 
-		void onClick (IButton button)
+		void onClick (IButton btn)
 		{
-			if (button.Drawable == null) {
-				createPopupMenu(button);
+			if (btn.Drawable == null) {
+				createPopupMenu(btn);
 			} else {
-				destroyPopupMenu(button);
+				destroyPopupMenu(btn);
 			}
 		}
 
-		void createPopupMenu(IButton button) {
+		void createPopupMenu(IButton btn) {
 			bool vesselSelected = TrackingStationUtils.getSelectedVessel () != null;
-			PopupMenuDrawable menu = new PopupMenuDrawable();
+			var menu = new PopupMenuDrawable();
 
 			IButton optShowParts = menu.AddOption("Show parts");
 			optShowParts.Enabled = vesselSelected;
-			optShowParts.OnClick += (e) => showParts();
+			optShowParts.OnClick += e => showParts();
 
 			IButton optShowInfo = menu.AddOption("Show resources");
 			optShowInfo.Enabled = vesselSelected;
-			optShowInfo.OnClick += (e) => showInfo();
+			optShowInfo.OnClick += e => showInfo();
 
 			IButton optShowOrbit = menu.AddOption("Orbit parameters");
 			optShowOrbit.Enabled = vesselSelected || (TrackingStationUtils.getSelectedPlanet() != null);
-			optShowOrbit.OnClick += (e) => showOrbit();
+			optShowOrbit.OnClick += e => showOrbit();
 
-			menu.OnAnyOptionClicked += () => destroyPopupMenu(button);
-			button.Drawable = menu;
+			menu.OnAnyOptionClicked += () => destroyPopupMenu(btn);
+			btn.Drawable = menu;
 		}
 
 		void showParts()
@@ -87,10 +87,10 @@ namespace TrackingStationUtils
 			TrackingStationUtils.ShowOrbit ();
 		}
 
-		void destroyPopupMenu (IButton button)
+		void destroyPopupMenu (IButton btn)
 		{
-			((PopupMenuDrawable)button.Drawable).Destroy ();
-			button.Drawable = null;
+			((PopupMenuDrawable)btn.Drawable).Destroy ();
+			btn.Drawable = null;
 		}
 
 		void OnDestroy()

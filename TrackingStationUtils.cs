@@ -41,13 +41,14 @@ namespace TrackingStationUtils
 		Rect winRect = new Rect(210, 100, 100, 20);
 		Vector2 scrollPosition = Vector2.zero;
 
-		float sep1 = 38f;
-		float sep2 = 4.1f;
-		float sep3 = 4.8f;
-		float maxRows = 15;
 		Vector2 colSize1;
 		Vector2 colSize2;
 		float rows;
+
+		const float sep1 = 38f;
+		const float sep2 = 4.1f;
+		const float sep3 = 4.8f;
+		const float maxRows = 15;
 
 		TrackingStationUtils ()
 		{
@@ -63,16 +64,8 @@ namespace TrackingStationUtils
 		{
 			Vessel oldVessel = vessel;
 			CelestialBody oldPlanet = planet;
-			if (isVesselSelected ()) {
-				vessel = PlanetariumCamera.fetch.target.vessel;
-			} else {
-				vessel = null;
-			}
-			if (isPlanetSelected ()) {
-				planet = PlanetariumCamera.fetch.target.celestialBody;
-			} else {
-				planet = null;
-			}
+			vessel = isVesselSelected () ? PlanetariumCamera.fetch.target.vessel : null;
+			planet = isPlanetSelected () ? PlanetariumCamera.fetch.target.celestialBody : null;
 			if ((oldVessel != vessel) || (oldPlanet != planet)) {
 				itemList = null;
 			}
@@ -181,21 +174,21 @@ namespace TrackingStationUtils
 			GUI.DragWindow ();
 		}
 
-		Dictionary<string, string> getPartList (Vessel vessel)
+		Dictionary<string, string> getPartList (Vessel vssl)
 		{
-			Dictionary<string, int> dict = new Dictionary<string, int> ();
+			var dict = new Dictionary<string, int> ();
 
-			foreach (var part in vessel.protoVessel.protoPartSnapshots) {
-				string name = part.partInfo.title;
+			foreach (var part in vssl.protoVessel.protoPartSnapshots) {
+				string title = part.partInfo.title;
 				int count = 0;
-				if (dict.TryGetValue (name, out count)) {
+				if (dict.TryGetValue (title, out count)) {
 					count += 1;
-					dict [name] = count;
+					dict [title] = count;
 				} else {
-					dict [name] = 1;
+					dict [title] = 1;
 				}
 			}
-			Dictionary <string, string> dict2 = new Dictionary<string, string> ();
+			var dict2 = new Dictionary<string, string> ();
 			foreach (var item in dict) {
 				if (item.Value > 1) {
 					dict2 [item.Key] = String.Format ("x{0}", item.Value);
@@ -206,31 +199,27 @@ namespace TrackingStationUtils
 			return dict2;
 		}
 
-		Dictionary<string, string> getResourceList (Vessel vessel)
+		Dictionary<string, string> getResourceList (Vessel vssl)
 		{
-			Dictionary<string, float> dict = new Dictionary<string, float> ();
+			var dict = new Dictionary<string, float> ();
 
-			foreach (var part in vessel.protoVessel.protoPartSnapshots) {
+			foreach (var part in vssl.protoVessel.protoPartSnapshots) {
 				foreach (var res in part.resources) {
-					string name = res.resourceName;
+					string rsrc = res.resourceName;
 					string value = res.resourceValues.GetValue ("amount");
 					float amount = 0;
-					if (String.IsNullOrEmpty (value)) {
-						amount = 0;
-					} else {
-						amount = float.Parse (value);
-					}
+					amount = String.IsNullOrEmpty (value) ? 0 : float.Parse (value);
 					if (amount > 0.01) {
 						float value2 = 0;
-						if (dict.TryGetValue (name, out value2)) {
-							dict [name] = value2 + amount;
+						if (dict.TryGetValue (rsrc, out value2)) {
+							dict [rsrc] = value2 + amount;
 						} else {
-							dict [name] = amount;
+							dict [rsrc] = amount;
 						}
 					}
 				}
 			}
-			Dictionary<string, string> dict2 = new Dictionary<string, string> ();
+			var dict2 = new Dictionary<string, string> ();
 			foreach (var item in dict) {
 				dict2 [item.Key] = item.Value.ToString ("0.##");
 			}
@@ -239,7 +228,7 @@ namespace TrackingStationUtils
 
 		Dictionary<string, string> getOrbitParams (Orbit orbit)
 		{
-			Dictionary<string, string> dict = new Dictionary<string, string> ();
+			var dict = new Dictionary<string, string> ();
 			dict ["Semi-major axis"] = Utils.format_SI (orbit.semiMajorAxis);
 			dict ["Eccentricity"] = orbit.eccentricity.ToString ("0.####");
 			dict ["Inclination"] = Utils.format_angle (orbit.inclination);
