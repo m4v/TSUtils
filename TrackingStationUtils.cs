@@ -25,6 +25,94 @@ using UnityEngine;
 
 namespace TrackingStationUtils
 {
+	interface ITwoValueColumn {
+		string Name { get; }
+		string Value { get; }
+	}
+		
+	public class ResourceCount : ITwoValueColumn
+	{
+		List<ProtoPartResourceSnapshot> resources = new List<ProtoPartResourceSnapshot> ();
+		string resourceName;
+
+		public ResourceCount (string name) {
+			resourceName = name;
+		}
+
+		public ResourceCount (ProtoPartResourceSnapshot res)
+		{
+			resourceName = res.resourceName;
+			resources.Add (res);
+		}
+
+		#region ITwoValueColumn implementation
+		public string Name {
+			get { return resourceName; }
+		}
+
+		public string Value {
+			get { return Amount.ToString ("0.##"); }
+		}
+		#endregion
+
+		public void Add (ProtoPartResourceSnapshot resource) {
+			resources.Add (resource);
+		}
+
+		public float Amount {
+			get {
+				float total = 0;
+				foreach (var r in resources) {
+					string s = r.resourceValues.GetValue ("amount");
+					float v = string.IsNullOrEmpty (s) ? 0 : float.Parse (s);
+					total += v;
+				}
+				return total;
+			}
+		}
+
+	}
+
+	public class StringPair : ITwoValueColumn
+	{
+		string name, value;
+
+		public StringPair (string name, string value)
+		{
+			this.name = name;
+			this.value = value;
+		}
+
+		#region ITwoValueColumn implementation
+		public string Name {
+			get { return name; }
+		}
+		public string Value {
+			get { return value; }
+		}
+		#endregion
+	}
+
+	public class DynamicValueItem : ITwoValueColumn
+	{
+		string name;
+		Func<string> getValueMethod;
+
+		public DynamicValueItem(string name, Func<string> method) {
+			this.name = name;
+			this.getValueMethod = method;
+		}
+
+		#region ITwoValueColumn implementation
+		public string Name {
+			get { return name; }
+		}
+		public string Value {
+			get { return getValueMethod ();	}
+		}
+		#endregion
+	}
+
 	[KSPAddon(KSPAddon.Startup.TrackingStation, false)]
 	public class TrackingStationUtils : MonoBehaviour
 	{
@@ -37,7 +125,7 @@ namespace TrackingStationUtils
 		CelestialBody planet;
 		int windowsId;
 		bool guiEnabled = false;
-		Dictionary<string, string> itemList;
+		List<ITwoValueColumn> itemList;
 		Rect winRect = new Rect(210, 100, 100, 20);
 		Vector2 scrollPosition = Vector2.zero;
 
@@ -154,11 +242,11 @@ namespace TrackingStationUtils
 				{
 					GUILayout.BeginVertical ();
 					{
-						foreach (var pair in itemList) {
+						foreach (var item in itemList) {
 							GUILayout.BeginHorizontal ();
 							{
-								GUILayout.Label (pair.Key, GUILayout.Width (colSize1.x));
-								GUILayout.Label (pair.Value, GUILayout.Width (colSize2.x));
+								GUILayout.Label (item.Name, GUILayout.Width (colSize1.x));
+								GUILayout.Label (item.Value, GUILayout.Width (colSize2.x));
 							}
 							GUILayout.EndHorizontal ();
 						}
@@ -173,7 +261,7 @@ namespace TrackingStationUtils
 			GUI.DragWindow ();
 		}
 
-		Dictionary<string, string> getPartList (Vessel vssl)
+		List<ITwoValueColumn> getPartList (Vessel vssl)
 		{
 			var dict = new Dictionary<string, int> ();
 
@@ -187,63 +275,57 @@ namespace TrackingStationUtils
 					dict [title] = 1;
 				}
 			}
-			var dict2 = new Dictionary<string, string> ();
+			var list = new List<ITwoValueColumn> ();
 			foreach (var item in dict) {
 				if (item.Value > 1) {
-					dict2 [item.Key] = String.Format ("x{0}", item.Value);
+					list.Add(new StringPair(item.Key, String.Format ("x{0}", item.Value)));
 				} else {
-					dict2 [item.Key] = " ";
+					list.Add(new StringPair(item.Key, " "));
 				}
 			}
-			return dict2;
+			return list;
 		}
 
-		Dictionary<string, string> getResourceList (Vessel vssl)
+		List<ITwoValueColumn> getResourceList (Vessel vssl)
 		{
-			var dict = new Dictionary<string, float> ();
+			var dict = new Dictionary<string, ResourceCount> ();
+			var list = new List<ITwoValueColumn> ();
 
 			foreach (var part in vssl.protoVessel.protoPartSnapshots) {
 				foreach (var res in part.resources) {
-					string rsrc = res.resourceName;
-					string value = res.resourceValues.GetValue ("amount");
-					float amount = 0;
-					amount = String.IsNullOrEmpty (value) ? 0 : float.Parse (value);
-					if (amount > 0.01) {
-						float value2 = 0;
-						if (dict.TryGetValue (rsrc, out value2)) {
-							dict [rsrc] = value2 + amount;
-						} else {
-							dict [rsrc] = amount;
-						}
+					string name = res.resourceName;
+					ResourceCount item;
+					if (dict.TryGetValue (name, out item)) {
+						item.Add (res);
+					} else {
+						var rc = dict [name] = new ResourceCount(res);
+						list.Add (rc);
 					}
 				}
 			}
-			var dict2 = new Dictionary<string, string> ();
-			foreach (var item in dict) {
-				dict2 [item.Key] = item.Value.ToString ("0.##");
-			}
-			return dict2;
+
+			return list;
 		}
 
-		Dictionary<string, string> getOrbitParams (Orbit orbit)
+		List<ITwoValueColumn> getOrbitParams (Orbit orbit)
 		{
-			var dict = new Dictionary<string, string> ();
-			dict ["Semi-major axis"] = Utils.format_SI (orbit.semiMajorAxis);
-			dict ["Eccentricity"] = orbit.eccentricity.ToString ("0.####");
-			dict ["Inclination"] = Utils.format_angle (orbit.inclination);
-			dict ["Argument of Pe"] = Utils.format_angle (orbit.argumentOfPeriapsis);
-			dict ["Longitude of AN"] = Utils.format_angle (orbit.LAN);
-			dict ["True anomaly"] = Utils.format_angle (orbit.trueAnomaly);
-			dict ["Orbital period"] = Utils.format_time (orbit.period);
+			var list = new List<ITwoValueColumn> ();
+			list.Add(new DynamicValueItem("Semi-major axis", () => Utils.format_SI (orbit.semiMajorAxis)));
+			list.Add(new DynamicValueItem("Eccentricity", () => orbit.eccentricity.ToString ("0.####")));
+			list.Add(new DynamicValueItem("Inclination", () => Utils.format_angle (orbit.inclination)));
+			list.Add(new DynamicValueItem("Argument of Pe", () => Utils.format_angle (orbit.argumentOfPeriapsis)));
+			list.Add(new DynamicValueItem("Longitude of AN", () => Utils.format_angle (orbit.LAN)));
+			list.Add(new DynamicValueItem("True anomaly", () => Utils.format_angle (orbit.trueAnomaly)));
+			list.Add(new DynamicValueItem("Orbital period", () => Utils.format_time (orbit.period)));
 
-			return dict;
+			return list;
 		}
 
 		void updateColumnSizes() {
 			colSize1 = Vector2.zero;
 			colSize2 = Vector2.zero;
 			foreach (var item in itemList) {
-				Vector2 size1 = GUI.skin.label.CalcSize (new GUIContent (item.Key));
+				Vector2 size1 = GUI.skin.label.CalcSize (new GUIContent (item.Name));
 				if (colSize1.x < size1.x) {
 					colSize1 = size1;
 				}
